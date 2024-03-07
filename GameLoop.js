@@ -1,6 +1,7 @@
 export default class GameLoop {
   #update;
   #request;
+  #prevTime
   /**
    *
    * @param {FrameRequestCallback} update
@@ -9,13 +10,15 @@ export default class GameLoop {
     this.#update = update;
   }
 
-  #next(time) {
-    this.#update(time);
-    this.#request = requestAnimationFrame((time) => this.#next(time));
+  #next(currentTime) {
+    this.#prevTime ||= currentTime;
+    this.#update(currentTime - this.#prevTime);
+    this.#prevTime = currentTime;
+    this.#request = requestAnimationFrame((currentTime) => this.#next(currentTime));
   }
 
   start() {
-    this.#request = requestAnimationFrame((time) => this.#next(time));
+    this.#request = requestAnimationFrame((currentTime) => this.#next(currentTime));
   }
 
   stop() {
@@ -23,5 +26,6 @@ export default class GameLoop {
       cancelAnimationFrame(this.#request);
       this.#request = undefined;
     }
+    this.#prevTime = undefined;
   }
 }
