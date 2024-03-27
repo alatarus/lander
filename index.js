@@ -19,9 +19,9 @@ const startButton = document.querySelector("#start");
  */
 const stopButton = document.querySelector("#stop");
 
-const ENGINE_IMPULSE = 0.5; // px / sec ** 2
+const ENGINE_IMPULSE = 50; // px / sec ** 2
 const MANEUVER_TRUSTER_IMPULSE = 0.4; // rad / sec ** 2
-const GRAVITY = 0.25; // px / sec ** 2
+const GRAVITY = 15; // px / sec ** 2
 
 const rocket = {
   leftMT: false,
@@ -70,12 +70,10 @@ function render(time, orientation) {
   context.resetTransform();
   context.translate(rocket.position.x, rocket.position.y);
 
-  const scaledVelocity = scalarMultiplication(rocket.velocity, 30);
-
   context.beginPath();
   context.strokeStyle = "red";
   context.moveTo(0, 0);
-  context.lineTo(scaledVelocity.x, scaledVelocity.y);
+  context.lineTo(rocket.velocity.x, rocket.velocity.y);
   context.stroke();
 }
 
@@ -133,7 +131,7 @@ const gameLoop = new GameLoop((time) => {
   rocket.velocity = vector2DSum(rocket.velocity, new DOMPoint(0, GRAVITY * frameTimePerSecond));
   rocket.rotation += rocket.yawMoment * frameTimePerSecond;
 
-  const newPosition = vector2DSum(rocket.position, rocket.velocity);
+  const newPosition = vector2DSum(rocket.position, scalarMultiplication(rocket.velocity, frameTimePerSecond));
 
   newPosition.x = newPosition.x < 0 ? width - newPosition.x : newPosition.x % width;
   newPosition.y = newPosition.y < 0 ? height - newPosition.y : newPosition.y % height;
